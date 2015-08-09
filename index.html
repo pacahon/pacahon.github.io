@@ -1,0 +1,96 @@
+<html lang="ru" hola_ext_inject="disabled"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Числа прописью в именительном падеже.</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="http://chancejs.com/chance.min.js"></script>
+	<script>
+		$(function() {
+
+	    var mySeed;
+	    $.get("https://www.random.org/integers/", {num: "1", col: "1", min: "1", max: "1000000000", base: "10", format: "plain", rnd: "new"}, function(randNum) {
+	     	mySeed = randNum;
+	    	// Instantiate Chance with this truly random number as the seed
+	    	var seededchance = new Chance(mySeed);
+	    	for (var i = 0; i <= 30; i++) {
+	    		var new_number = seededchance.integer({min: 0, max: 1000000000});
+	    		$('#numbers tbody').append('<tr>' + 
+	    			'<td>'+ i + '</td>' +
+	    			'<td>'+
+	    				'<span class="play" data-value="' + new_number + '"><i class="fa fa-play fa-2x"></i></span>  '+
+	    				'<span class="eye" data-value="' + new_number + '"><i class="fa fa-eye fa-2x"></i></span>'+
+	    			'</td><td>&nbsp;</td>' +
+	    		'</tr>');
+			};
+	    });
+
+		var msg = new SpeechSynthesisUtterance();
+		var voices = window.speechSynthesis.getVoices();
+		msg.voice = voices[10]; // Note: some voices don't support altering params
+		msg.voiceURI = 'native';
+		msg.volume = 1; // 0 to 1
+		// msg.rate = 1; // 0.1 to 10
+		// msg.pitch = 2; //0 to 2
+		msg.lang = 'ru-RU';
+		msg.onend = function(e) {
+			console.log('Finished in ' + event.elapsedTime + ' seconds.');
+		};
+		// play
+		$( "#numbers tbody" ).on( "click", "span.play", function() {
+			var text = $(this).data('value');
+			msg.text = text;
+			speechSynthesis.speak(msg);
+		} );
+		// show
+		$( "#numbers tbody" ).on( "click", "span.eye", function() {
+			var text = $(this).data('value');
+			$(this).closest('td').next().text(text);
+		} );
+
+		});
+	</script>
+	<style>
+		#numbers span {
+			font-size: 14px;
+			cursor: pointer;
+		}
+
+	</style>
+</script>
+
+  </head>
+
+  <body>
+
+    <div class="container">
+      <div class="header clearfix">
+        <h1 class="text-muted">Тест генератора чисел</h1>
+      </div>
+
+	<table class="table table-striped" id="numbers">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th></th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody >
+			<tr>
+			</tr>
+		</tbody>
+	</table>
+
+    </div> <!-- /container -->
+
+</body></html>
