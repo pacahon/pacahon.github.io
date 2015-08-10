@@ -20,24 +20,37 @@
             return new Array( num + 1 ).join( this );
         }
 
-        if (!('speechSynthesis' in window)) {
-            alert('speech synthesis isnt supported. Damn');
-        }
+
         var utterance = new SpeechSynthesisUtterance();
-        utterance.voiceURI = 'native';
+        utterance.lang = 'ru-RU';
+        utterance.voiceURI = 'ru-RU';
         utterance.volume = 1; // 0 to 1
         utterance.rate = 0.1; // 0.1 to 10
         // utterance.pitch = 2; //0 to 2
-        utterance.lang = 'ru-RU';
-        utterance.initialized = false;
-        window.speechSynthesis.onvoiceschanged = function () {
-            var voices = window.speechSynthesis.getVoices();
-            utterance.voice = voices[10]; // Note: some voices don't support altering params
-            utterance.onend = function(e) {
-                console.log('Finished in ' + event.elapsedTime + ' seconds.');
-            };
-            utterance.initialized = true;
-        }
+
+        // window.speechSynthesis.onvoiceschanged = function () {
+        //     var voices = window.speechSynthesis.getVoices();
+        //     utterance.voice = voices[10]; // Note: some voices don't support altering params
+        //     utterance.onend = function(e) {
+        //         console.log('Finished in ' + event.elapsedTime + ' seconds.');
+        //     };
+        //     console.log(voices[10]);
+        //     utterance.initialized = true;
+        // }
+
+        // onvoiceschanged not working in iOS, so we use timer...
+        var timer = setInterval(function() {
+            if ('speechSynthesis' in window) {
+                var available_voices = speechSynthesis.getVoices();
+                if (available_voices.length !== 0) {
+                    clearInterval(timer);
+                    utterance.voice = available_voices[10];
+                }
+            } else {
+                clearInterval(timer);
+                alert('speech synthesis isnt supported. Damn');
+            }
+        }, 1000);
 
         $(function() {
 
@@ -65,9 +78,6 @@
     		$( "#numbers" ).on( "click", ".play", function() {
                 var wrapper = $(this).closest('.btn-group');
                 var text = wrapper.data('value');
-                if (!utterance.initialized) {
-                    alert('Wait a second... Utterance not initialized yet.');
-                }
                 utterance.text = text;
                 speechSynthesis.speak(utterance);
             } );
@@ -95,7 +105,7 @@
         <div class="row">
             <div class="col-xs-12 col-lg-6">
                 <div class="header clearfix">
-                    <h1 class="text-muted">Генератор чисел #1</h1>
+                    <h1 class="text-muted">Генератор чисел #2</h1>
                 </div>
 
                 <ul class="list-group" id="numbers">
