@@ -20,54 +20,56 @@
             return new Array( num + 1 ).join( this );
         }
 
+        var utterance = new SpeechSynthesisUtterance();
+        var voices = window.speechSynthesis.getVoices();
+        utterance.voice = voices[10]; // Note: some voices don't support altering params
+        utterance.voiceURI = 'native';
+        utterance.volume = 1; // 0 to 1
+        utterance.rate = 0.1; // 0.1 to 10
+        // utterance.pitch = 2; //0 to 2
+        utterance.lang = 'ru-RU';
+        utterance.onend = function(e) {
+            console.log('Finished in ' + event.elapsedTime + ' seconds.');
+        };
+
 		$(function() {
             if (!('speechSynthesis' in window)) {
                 alert('speech synthesis isnt supported. Damn');
             }
 
-	    var mySeed;
-	    $.get("https://www.random.org/integers/", {num: "1", col: "1", min: "1", max: "1000", base: "10", format: "plain", rnd: "new"}, function(randNum) {
-	     	mySeed = randNum;
-	    	// Instantiate Chance with this truly random number as the seed
-	    	var seededchance = new Chance(mySeed);
-            $('#numbers').html('');
-	    	for (var i = 0; i <= 30; i++) {
-	    		var new_number = seededchance.integer({min: 0, max: 1000000000});
-	    		$('#numbers').append('<li class="list-group-item">' + 
-	    			'<span class="val">' + 'X'.repeat(new_number.toString().length) + '</span> ' + 
-	    			'<div class="btn-group  pull-right" role="group" data-value="' + new_number + '">' + 
-                        '<button type="button" class="btn btn-default play"><i class="fa fa-volume-up"></i></button>' +
-	    			    '<button type="button" class="btn btn-default eye"><i class="fa fa-eye"></i></button>' +
-                    '</div>' + 
-                    '<div class="clearfix"></div>' +
-	    		'</li>');
-			};
-	    });
+    	    var mySeed;
+    	    $.get("https://www.random.org/integers/", {num: "1", col: "1", min: "1", max: "1000", base: "10", format: "plain", rnd: "new"}, function(randNum) {
+    	     	mySeed = randNum;
+    	    	// Instantiate Chance with this truly random number as the seed
+    	    	var seededchance = new Chance(mySeed);
+                $('#numbers').html('');
+    	    	for (var i = 0; i <= 30; i++) {
+    	    		var new_number = seededchance.integer({min: 0, max: 1000000000});
+    	    		$('#numbers').append('<li class="list-group-item">' + 
+    	    			'<span class="val">' + 'X'.repeat(new_number.toString().length) + '</span> ' + 
+    	    			'<div class="btn-group  pull-right" role="group" data-value="' + new_number + '">' + 
+                            '<button type="button" class="btn btn-default play"><i class="fa fa-volume-up"></i></button>' +
+    	    			    '<button type="button" class="btn btn-default eye"><i class="fa fa-eye"></i></button>' +
+                        '</div>' + 
+                        '<div class="clearfix"></div>' +
+    	    		'</li>');
+    			};
+    	    });
 
-		var msg = new SpeechSynthesisUtterance();
-		var voices = window.speechSynthesis.getVoices();
-		msg.voice = voices[10]; // Note: some voices don't support altering params
-		msg.voiceURI = 'native';
-		msg.volume = 1; // 0 to 1
-		msg.rate = 0.1; // 0.1 to 10
-		// msg.pitch = 2; //0 to 2
-		msg.lang = 'ru-RU';
-		msg.onend = function(e) {
-			console.log('Finished in ' + event.elapsedTime + ' seconds.');
-		};
-		// play
-		$( "#numbers" ).on( "click", ".play", function() {
-            var wrapper = $(this).closest('.btn-group');
-            var text = wrapper.data('value');
-            msg.text = text;
-            speechSynthesis.speak(msg);
-        } );
-        // show
-        $( "#numbers" ).on( "click", ".eye", function() {
-            var wrapper = $(this).closest('.btn-group');
-			var text = wrapper.data('value');
-			wrapper.prev().text(numeral(text).format('0,0'));
-		} );
+
+    		// play
+    		$( "#numbers" ).on( "click", ".play", function() {
+                var wrapper = $(this).closest('.btn-group');
+                var text = wrapper.data('value');
+                utterance.text = text;
+                speechSynthesis.speak(utterance);
+            } );
+            // show
+            $( "#numbers" ).on( "click", ".eye", function() {
+                var wrapper = $(this).closest('.btn-group');
+    			var text = wrapper.data('value');
+    			wrapper.prev().text(numeral(text).format('0,0'));
+    		} );
 
 		});
 	</script>
@@ -86,7 +88,7 @@
         <div class="row">
             <div class="col-xs-12 col-lg-6">
                 <div class="header clearfix">
-                    <h1 class="text-muted">Генератор чисел</h1>
+                    <h1 class="text-muted">Генератор чисел #1</h1>
                 </div>
 
                 <ul class="list-group" id="numbers">
