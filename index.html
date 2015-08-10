@@ -20,22 +20,26 @@
             return new Array( num + 1 ).join( this );
         }
 
+        if (!('speechSynthesis' in window)) {
+            alert('speech synthesis isnt supported. Damn');
+        }
         var utterance = new SpeechSynthesisUtterance();
-        var voices = window.speechSynthesis.getVoices();
-        utterance.voice = voices[10]; // Note: some voices don't support altering params
         utterance.voiceURI = 'native';
         utterance.volume = 1; // 0 to 1
         utterance.rate = 0.1; // 0.1 to 10
         // utterance.pitch = 2; //0 to 2
         utterance.lang = 'ru-RU';
-        utterance.onend = function(e) {
-            console.log('Finished in ' + event.elapsedTime + ' seconds.');
-        };
+        utterance.initialized = false;
+        window.speechSynthesis.onvoiceschanged = function () {
+            var voices = window.speechSynthesis.getVoices();
+            utterance.voice = voices[10]; // Note: some voices don't support altering params
+            utterance.onend = function(e) {
+                console.log('Finished in ' + event.elapsedTime + ' seconds.');
+            };
+            utterance.initialized = true;
+        }
 
-		$(function() {
-            if (!('speechSynthesis' in window)) {
-                alert('speech synthesis isnt supported. Damn');
-            }
+        $(function() {
 
     	    var mySeed;
     	    $.get("https://www.random.org/integers/", {num: "1", col: "1", min: "1", max: "1000", base: "10", format: "plain", rnd: "new"}, function(randNum) {
@@ -61,6 +65,9 @@
     		$( "#numbers" ).on( "click", ".play", function() {
                 var wrapper = $(this).closest('.btn-group');
                 var text = wrapper.data('value');
+                if (!utterance.initialized) {
+                    alert('Wait a second... Utterance not initialized yet.');
+                }
                 utterance.text = text;
                 speechSynthesis.speak(utterance);
             } );
